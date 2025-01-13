@@ -5,7 +5,7 @@ import pygame
 
 pygame.init()
 pygame.key.set_repeat(200, 70)
-size = width, height = 500, 500
+size = width, height = 700, 700
 screen = pygame.display.set_mode(size)
 FPS = 50
 clock = pygame.time.Clock()
@@ -77,12 +77,12 @@ def load_level(filename):
 
 
 tile_images = {
-    'wall': pygame.transform.scale(load_image('Tentacle.png'), (50, 50)),
-    'empty': pygame.transform.scale(load_image('Tiles.png'), (50,50))
+    'wall': pygame.transform.scale(load_image('Tentacle.png'), (70, 70)),
+    'empty': pygame.transform.scale(load_image('Tiles.png'), (70,70))
 }
-player_image = load_image('mar.png')
+player_image = load_image('Cat_Warrior.png')
 
-tile_width = tile_height = 50
+tile_width = tile_height = 70
 
 # основной персонаж
 player = None
@@ -132,7 +132,7 @@ class Player(pygame.sprite.Sprite):
 def end_screen():
     outro_text = ["Ты победил!", ""
                   "Поздравляю!", ""
-                  "Нажми любую кнопку что-бы выйти."]
+                  "Нажми любую кнопку, чтобы выйти."]
 
     fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
     screen.blit(fon, (0, 0))
