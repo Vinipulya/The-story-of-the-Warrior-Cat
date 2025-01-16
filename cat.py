@@ -117,22 +117,12 @@ class Tile(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y):
         if tile_type == 'wall':
             super().__init__(tiles_group, all_sprites, wall_group)
+        elif tile_type == 'pobeda':
+            super().__init__(tiles_group, all_sprites, pobeda_group)
         else:
             super().__init__(tiles_group, all_sprites)
         self.image = tile_images[tile_type]
         self.tile_type = tile_type
-        self.rect = self.image.get_rect().move(
-            tile_width * pos_x, tile_height * pos_y)
-
-
-class Pobeda(pygame.sprite.Sprite):
-    def __init__(self, pobeda_type, pos_x, pos_y):
-        if pobeda_type == 'pobeda':
-            super().__init__(pobeda_group, all_sprites, wall_group, tiles_group)
-        else:
-            super().__init__(pobeda_group, all_sprites)
-        self.image = tile_images[pobeda_type]
-        self.pobeda_type = pobeda_type
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
 
@@ -236,28 +226,25 @@ while running:
             if event.key == pygame.K_LEFT:
                 player.rect.x -= STEP
                 if pygame.sprite.groupcollide(player_group, wall_group, False, False):
-                    player.rect.x += STEP
+                    loose_screen()
                 if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
                     end_screen()
-
             if event.key == pygame.K_RIGHT:
                 player.rect.x += STEP
                 if pygame.sprite.groupcollide(player_group, wall_group, False, False):
-                    player.rect.x -= STEP
+                    loose_screen()
                 if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
                     end_screen()
-
             if event.key == pygame.K_UP:
                 player.rect.y -= STEP
                 if pygame.sprite.groupcollide(player_group, wall_group, False, False):
-                    player.rect.y += STEP
+                    loose_screen()
                 if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
                     end_screen()
-
             if event.key == pygame.K_DOWN:
                 player.rect.y += STEP
                 if pygame.sprite.groupcollide(player_group, wall_group, False, False):
-                    player.rect.y -= STEP
+                    loose_screen()
                 if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
                     end_screen()
 
