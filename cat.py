@@ -5,7 +5,7 @@ import pygame
 
 pygame.init()
 pygame.key.set_repeat(200, 70)
-size = width, height = 700, 700
+size = width, height = 900, 900
 screen = pygame.display.set_mode(size)
 FPS = 50
 clock = pygame.time.Clock()
@@ -78,7 +78,8 @@ def load_level(filename):
 
 tile_images = {
     'wall': pygame.transform.scale(load_image('Tentacle.png'), (70, 70)),
-    'empty': pygame.transform.scale(load_image('Tiles.png'), (70,70))
+    'empty': pygame.transform.scale(load_image('Tiles.png'), (70, 70)),
+    'pobeda': pygame.transform.scale(load_image("pobeda.jpg"), (70, 70))
 }
 player_image = load_image('Cat_Warrior.png')
 
@@ -92,6 +93,7 @@ all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
+pobeda_group = pygame.sprite.Group()
 
 
 def generate_level(level):
@@ -102,6 +104,8 @@ def generate_level(level):
                 Tile('empty', x, y)
             elif level[y][x] == '#':
                 Tile('wall', x, y)
+            elif level[y][x] == 'p':
+                Tile('pobeda', x, y)
             elif level[y][x] == '@':
                 Tile('empty', x, y)
                 new_player = Player(x, y)
@@ -121,6 +125,18 @@ class Tile(pygame.sprite.Sprite):
             tile_width * pos_x, tile_height * pos_y)
 
 
+class Pobeda(pygame.sprite.Sprite):
+    def __init__(self, pobeda_type, pos_x, pos_y):
+        if pobeda_type == 'pobeda':
+            super().__init__(pobeda_group, all_sprites, wall_group, tiles_group)
+        else:
+            super().__init__(pobeda_group, all_sprites)
+        self.image = tile_images[pobeda_type]
+        self.pobeda_type = pobeda_type
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(player_group, all_sprites)
@@ -129,10 +145,11 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(
             tile_width * pos_x + 15, tile_height * pos_y + 5)
 
+
 def end_screen():
     outro_text = ["Ты победил!", ""
-                  "Поздравляю!", ""
-                  "Нажми любую кнопку, чтобы выйти."]
+                                 "Поздравляю!", ""
+                                                "Нажми любую кнопку, чтобы выйти."]
 
     fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
     screen.blit(fon, (0, 0))
@@ -158,11 +175,57 @@ def end_screen():
         clock.tick(FPS)
 
 
+def loose_screen():
+    outro_text = ["Ты проиграл.", ""
+                                  "", ""
+                                      "Нажми любую кнопку, чтобы выйти."]
+
+    fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 30)
+    text_coord = 70
+    for line in outro_text:
+        string_rendered = font.render(line, 1, pygame.Color('red'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                terminate()
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
+class Camera:
+    # зададим начальный сдвиг камеры
+    def __init__(self):
+        self.dx = 0
+        self.dy = 0
+
+    # сдвинуть объект obj на смещение камеры
+    def apply(self, obj):
+        obj.rect.x += self.dx
+        obj.rect.y += self.dy
+
+    # позиционировать камеру на объекте target
+    def update(self, target):
+        self.dx = -(target.rect.x + target.rect.w // 2 - width // 2)
+        self.dy = -(target.rect.y + target.rect.h // 2 - height // 2)
+
 
 start_screen()
 player, level_x, level_y = generate_level(load_level('map.txt'))
 running = True
 STEP = 10
+camera = Camera()
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -174,19 +237,34 @@ while running:
                 player.rect.x -= STEP
                 if pygame.sprite.groupcollide(player_group, wall_group, False, False):
                     player.rect.x += STEP
+                if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
+                    end_screen()
+
             if event.key == pygame.K_RIGHT:
                 player.rect.x += STEP
                 if pygame.sprite.groupcollide(player_group, wall_group, False, False):
                     player.rect.x -= STEP
+                if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
+                    end_screen()
+
             if event.key == pygame.K_UP:
                 player.rect.y -= STEP
                 if pygame.sprite.groupcollide(player_group, wall_group, False, False):
                     player.rect.y += STEP
+                if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
+                    end_screen()
+
             if event.key == pygame.K_DOWN:
                 player.rect.y += STEP
                 if pygame.sprite.groupcollide(player_group, wall_group, False, False):
                     player.rect.y -= STEP
+                if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
+                    end_screen()
+
     screen.fill(pygame.Color(0, 0, 0))
+    camera.update(player)
+    for sprite in all_sprites:
+        camera.apply(sprite)
     tiles_group.draw(screen)
     player_group.draw(screen)
     pygame.display.flip()
