@@ -44,7 +44,7 @@ def start_screen():
     font = pygame.font.Font(None, 30)
     text_coord = 70
     for line in intro_text:
-        string_rendered = font.render(line, 1, pygame.Color('red'))
+        string_rendered = font.render(line, 1, pygame.Color('white'))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
@@ -146,7 +146,7 @@ def end_screen():
     font = pygame.font.Font(None, 30)
     text_coord = 70
     for line in outro_text:
-        string_rendered = font.render(line, 1, pygame.Color('red'))
+        string_rendered = font.render(line, 1, pygame.Color('white'))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
@@ -175,7 +175,7 @@ def loose_screen():
     font = pygame.font.Font(None, 30)
     text_coord = 70
     for line in outro_text:
-        string_rendered = font.render(line, 1, pygame.Color('red'))
+        string_rendered = font.render(line, 1, pygame.Color('white'))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
@@ -211,50 +211,53 @@ class Camera:
         self.dy = -(target.rect.y + target.rect.h // 2 - height // 2)
 
 
+def first_level():
+    player, level_x, level_y = generate_level(load_level('map.txt'))
+    running = True
+    STEP = 10
+    camera = Camera()
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif player.rect.x >= width:
+                end_screen()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    player.rect.x -= STEP
+                    if pygame.sprite.groupcollide(player_group, wall_group, False, False):
+                        loose_screen()
+                    if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
+                        end_screen()
+                if event.key == pygame.K_RIGHT:
+                    player.rect.x += STEP
+                    if pygame.sprite.groupcollide(player_group, wall_group, False, False):
+                        loose_screen()
+                    if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
+                        end_screen()
+                if event.key == pygame.K_UP:
+                    player.rect.y -= STEP
+                    if pygame.sprite.groupcollide(player_group, wall_group, False, False):
+                        loose_screen()
+                    if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
+                        end_screen()
+                if event.key == pygame.K_DOWN:
+                    player.rect.y += STEP
+                    if pygame.sprite.groupcollide(player_group, wall_group, False, False):
+                        loose_screen()
+                    if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
+                        end_screen()
+
+        screen.fill(pygame.Color(0, 0, 0))
+        camera.update(player)
+        for sprite in all_sprites:
+            camera.apply(sprite)
+        tiles_group.draw(screen)
+        player_group.draw(screen)
+        pygame.display.flip()
+
+        clock.tick(FPS)
+
 start_screen()
-player, level_x, level_y = generate_level(load_level('map.txt'))
-running = True
-STEP = 10
-camera = Camera()
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif player.rect.x >= width:
-            end_screen()
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                player.rect.x -= STEP
-                if pygame.sprite.groupcollide(player_group, wall_group, False, False):
-                    loose_screen()
-                if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
-                    end_screen()
-            if event.key == pygame.K_RIGHT:
-                player.rect.x += STEP
-                if pygame.sprite.groupcollide(player_group, wall_group, False, False):
-                    loose_screen()
-                if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
-                    end_screen()
-            if event.key == pygame.K_UP:
-                player.rect.y -= STEP
-                if pygame.sprite.groupcollide(player_group, wall_group, False, False):
-                    loose_screen()
-                if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
-                    end_screen()
-            if event.key == pygame.K_DOWN:
-                player.rect.y += STEP
-                if pygame.sprite.groupcollide(player_group, wall_group, False, False):
-                    loose_screen()
-                if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
-                    end_screen()
-
-    screen.fill(pygame.Color(0, 0, 0))
-    camera.update(player)
-    for sprite in all_sprites:
-        camera.apply(sprite)
-    tiles_group.draw(screen)
-    player_group.draw(screen)
-    pygame.display.flip()
-
-    clock.tick(FPS)
+first_level()
 terminate()
