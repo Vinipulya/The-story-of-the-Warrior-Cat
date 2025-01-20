@@ -12,7 +12,6 @@ FPS = 50
 clock = pygame.time.Clock()
 
 
-
 def terminate():
     pygame.quit()
     sys.exit()
@@ -152,6 +151,7 @@ class Player(pygame.sprite.Sprite):
             self.health -= 1
             print(self.health)
 
+
 def end_screen():
     outro_text = ["Ты победил!", ""
                                  "Поздравляю!", ""
@@ -169,6 +169,7 @@ def end_screen():
         intro_rect.x = 10
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
+
 
 def loading_screen():
     outro_text = ["Загрузка уровня..."]
@@ -197,7 +198,6 @@ def loading_screen():
         clock.tick(FPS)
 
 
-
 def loose_screen():
     outro_text = ["Ты проиграл.", ""
                                   "", ""
@@ -222,7 +222,7 @@ def loose_screen():
                 terminate()
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
-                return
+                return first_level()
 
         pygame.display.flip()
         clock.tick(FPS)
@@ -246,10 +246,11 @@ class Camera:
 
 
 currect_scene = None
+
+
 def switch_level(scene):
     global currect_scene
     currect_scene = scene
-
 
 
 def first_level():
@@ -271,7 +272,7 @@ def first_level():
                         player.rect.x -= STEP
                         if pygame.sprite.groupcollide(player_group, wall_group, False, False):
                             loose_screen()
-                            gameplay = False
+
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
                             loading_screen()
                             switch_level(second_level())
@@ -280,7 +281,6 @@ def first_level():
                         player.rect.x += STEP
                         if pygame.sprite.groupcollide(player_group, wall_group, False, False):
                             loose_screen()
-                            gameplay = False
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
                             loading_screen()
                             switch_level(second_level())
@@ -289,7 +289,6 @@ def first_level():
                         player.rect.y -= STEP
                         if pygame.sprite.groupcollide(player_group, wall_group, False, False):
                             loose_screen()
-                            gameplay = False
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
                             loading_screen()
                             switch_level(second_level())
@@ -298,7 +297,6 @@ def first_level():
                         player.rect.y += STEP
                         if pygame.sprite.groupcollide(player_group, wall_group, False, False):
                             loose_screen()
-                            gameplay = False
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
                             loading_screen()
                             switch_level(second_level())
@@ -314,6 +312,7 @@ def first_level():
             pygame.display.flip()
 
             clock.tick(FPS)
+
 
 def second_level():
     player, level_x, level_y = generate_level(load_level('map2.txt'))
@@ -346,7 +345,8 @@ def second_level():
         pygame.display.flip()
 
         clock.tick(FPS)
-    
+
+
 start_screen()
 switch_level(first_level())
 while currect_scene is not None:
