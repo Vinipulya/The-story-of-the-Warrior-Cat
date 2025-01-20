@@ -2,6 +2,7 @@ import os
 import sys
 from fileinput import close
 import time
+from random import randint
 
 import pygame
 
@@ -332,6 +333,7 @@ def second_level():
     STEP = 10
     camera = Camera()
     while running:
+        enemy_step = randint(0,3)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
@@ -343,10 +345,13 @@ def second_level():
                     enemy.rect.x -= STEP
                 if event.key == pygame.K_RIGHT or event.key == ord('d'):
                     player.rect.x += STEP
+                    enemy.rect.x += STEP
                 if event.key == pygame.K_UP or event.key == ord('w'):
                     player.rect.y -= STEP
+                    enemy.rect.y -= STEP
                 if event.key == pygame.K_DOWN or event.key == ord('s'):
                     player.rect.y += STEP
+                    enemy.rect.y += STEP
         screen.fill(pygame.Color(0, 0, 0))
         camera.update(player)
         for sprite in all_sprites:
