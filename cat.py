@@ -1,6 +1,5 @@
 import os
 import sys
-import time
 from fileinput import close
 
 import pygame
@@ -190,7 +189,7 @@ def loading_screen():
                 terminate()
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
-                close()
+                second_level()
         pygame.display.flip()
         clock.tick(FPS)
 
@@ -271,9 +270,9 @@ def first_level():
                             loose_screen()
                             gameplay = False
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
-                            # loading_screen()
+                            loading_screen()
                             switch_level(second_level())
-                            running = False
+                            gameplay = False
                     # if pygame.sprite.groupcollide(player_group, enemy_group, False, False):
                     # loose_screen()
                     if event.key == pygame.K_RIGHT or event.key == ord('d'):
@@ -282,9 +281,9 @@ def first_level():
                             loose_screen()
                             gameplay = False
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
-                            # loading_screen()
+                            loading_screen()
                             switch_level(second_level())
-                            running = False
+                            gameplay = False
                     # if pygame.sprite.groupcollide(player_group, enemy_group, False, False):
                     # loose_screen()
                     if event.key == pygame.K_UP or event.key == ord('w'):
@@ -293,9 +292,9 @@ def first_level():
                             loose_screen()
                             gameplay = False
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
-                            # loading_screen()
+                            loading_screen()
                             switch_level(second_level())
-                            running = False
+                            gameplay = False
                         # if pygame.sprite.groupcollide(player_group, enemy_group, False, False):
                         # loose_screen()
                     if event.key == pygame.K_DOWN or event.key == ord('s'):
@@ -304,24 +303,22 @@ def first_level():
                             loose_screen()
                             gameplay = False
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
-                            # loading_screen()
+                            loading_screen()
                             switch_level(second_level())
-                            running = False
+                            gameplay = False
                     # if pygame.sprite.groupcollide(player_group, enemy_group, False, False):
                     # loose_screen()
 
+            screen.fill(pygame.Color(0, 0, 0))
+            camera.update(player)
+            for sprite in all_sprites:
+                camera.apply(sprite)
+            tiles_group.draw(screen)
+            player_group.draw(screen)
+            enemy_group.draw(screen)
+            pygame.display.flip()
 
-
-        screen.fill(pygame.Color(0, 0, 0))
-        camera.update(player)
-        for sprite in all_sprites:
-            camera.apply(sprite)
-        tiles_group.draw(screen)
-        player_group.draw(screen)
-        enemy_group.draw(screen)
-        pygame.display.flip()
-
-        clock.tick(FPS)
+            clock.tick(FPS)
 
 def second_level():
     player, level_x, level_y = generate_level(load_level('map2.txt'))
@@ -344,16 +341,16 @@ def second_level():
                     player.rect.y -= STEP
                 if event.key == pygame.K_DOWN or event.key == ord('s'):
                     player.rect.y += STEP
-    screen.fill(pygame.Color(0, 0, 0))
-    camera.update(player)
-    for sprite in all_sprites:
-        camera.apply(sprite)
-    tiles_group.draw(screen)
-    player_group.draw(screen)
-    enemy_group.draw(screen)
-    pygame.display.flip()
+        screen.fill(pygame.Color(0, 0, 0))
+        camera.update(player)
+        for sprite in all_sprites:
+            camera.apply(sprite)
+        tiles_group.draw(screen)
+        player_group.draw(screen)
+        enemy_group.draw(screen)
+        pygame.display.flip()
 
-    clock.tick(FPS)
+        clock.tick(FPS)
     
 start_screen()
 switch_level(first_level())
