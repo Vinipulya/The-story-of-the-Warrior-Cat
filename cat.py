@@ -101,6 +101,9 @@ enemy_group = pygame.sprite.Group()
 
 
 def generate_level(level):
+    tiles_group.empty()
+    player_group.empty()
+    enemy_group.empty()
     new_player, x, y = None, None, None
     for y in range(len(level)):
         for x in range(len(level[y])):
@@ -273,8 +276,6 @@ def first_level():
                             loading_screen()
                             switch_level(second_level())
                             gameplay = False
-                    # if pygame.sprite.groupcollide(player_group, enemy_group, False, False):
-                    # loose_screen()
                     if event.key == pygame.K_RIGHT or event.key == ord('d'):
                         player.rect.x += STEP
                         if pygame.sprite.groupcollide(player_group, wall_group, False, False):
@@ -284,8 +285,6 @@ def first_level():
                             loading_screen()
                             switch_level(second_level())
                             gameplay = False
-                    # if pygame.sprite.groupcollide(player_group, enemy_group, False, False):
-                    # loose_screen()
                     if event.key == pygame.K_UP or event.key == ord('w'):
                         player.rect.y -= STEP
                         if pygame.sprite.groupcollide(player_group, wall_group, False, False):
@@ -295,8 +294,6 @@ def first_level():
                             loading_screen()
                             switch_level(second_level())
                             gameplay = False
-                        # if pygame.sprite.groupcollide(player_group, enemy_group, False, False):
-                        # loose_screen()
                     if event.key == pygame.K_DOWN or event.key == ord('s'):
                         player.rect.y += STEP
                         if pygame.sprite.groupcollide(player_group, wall_group, False, False):
@@ -306,8 +303,6 @@ def first_level():
                             loading_screen()
                             switch_level(second_level())
                             gameplay = False
-                    # if pygame.sprite.groupcollide(player_group, enemy_group, False, False):
-                    # loose_screen()
 
             screen.fill(pygame.Color(0, 0, 0))
             camera.update(player)
