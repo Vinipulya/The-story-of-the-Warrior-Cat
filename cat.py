@@ -150,6 +150,8 @@ class Player(pygame.sprite.Sprite):
         self.image = player_image
         self.tile_type = "player"
         self.health = 5
+        self.pos_x = pos_x
+        self.pos_y = pos_y
         self.rect = self.image.get_rect().move(
             tile_width * pos_x + 15, tile_height * pos_y + 5)
         hit_list = pygame.sprite.spritecollide(self, enemy_group, False)
@@ -165,6 +167,8 @@ class Enemy(pygame.sprite.Sprite):
         self.tile_type = "enemy"
         self.health = 1
         self.health = 5
+        self.pos_x = pos_x
+        self.pos_y = pos_y
         self.rect = self.image.get_rect().move(
             tile_width * pos_x + 15, tile_height * pos_y + 5)
         hit_list = pygame.sprite.spritecollide(self, enemy_group, False)
@@ -351,31 +355,40 @@ def second_level():
     STEP = 10
     camera = Camera()
     while running:
-        enemy_step = randint(0, 3)
+        print(player.pos_x, player.pos_y)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT or event.key == ord('a'):
                     player.rect.x -= STEP
+                    player.pos_x -= STEP
 
                 if event.key == pygame.K_RIGHT or event.key == ord('d'):
                     player.rect.x += STEP
+                    player.pos_x += STEP
 
                 if event.key == pygame.K_UP or event.key == ord('w'):
                     player.rect.y -= STEP
+                    player.pos_y -= STEP
 
                 if event.key == pygame.K_DOWN or event.key == ord('s'):
                     player.rect.y += STEP
+                    player.pos_y += STEP
 
-                if enemy_step == 0:
+                if enemy.pos_x > player.pos_x:
                     enemy.rect.x -= STEP
-                if enemy_step == 1:
+                    enemy.pos_x -= STEP
+                elif enemy.pos_x < player.pos_x:
                     enemy.rect.x += STEP
-                if enemy_step == 2:
-                    enemy.rect.y -= STEP
-                if enemy_step == 3:
+                    enemy.pos_x += STEP
+                if enemy.pos_y < player.pos_y:
                     enemy.rect.y += STEP
+                    enemy.pos_y += STEP
+                elif enemy.pos_y > player.pos_y:
+                    enemy.rect.y -= STEP
+                    enemy.pos_y -= STEP
+
         screen.fill(pygame.Color(0, 0, 0))
         camera.update(player)
         for sprite in all_sprites:
@@ -389,7 +402,7 @@ def second_level():
 
 
 start_screen()
-first_level()
+second_level()
 while currect_scene is not None:
     currect_scene()
 terminate()
