@@ -1,6 +1,8 @@
 import os
 import sys
 from fileinput import close
+import time
+from random import randint
 
 import pygame
 
@@ -81,9 +83,9 @@ tile_images = {
     'wall': pygame.transform.scale(load_image('Tentacle.png'), (70, 70)),
     'empty': pygame.transform.scale(load_image('Tiles.png'), (70, 70)),
     'pobeda': pygame.transform.scale(load_image("pobeda.jpg"), (70, 70)),
-    'enemy': pygame.transform.scale(load_image("Ishak.png"), (70, 70))
 }
 player_image = load_image('Cat_Warrior.png')
+enemy_image = pygame.transform.scale(load_image("Ishak.png"), (70, 70))
 
 tile_width = tile_height = 70
 
@@ -100,10 +102,12 @@ enemy_group = pygame.sprite.Group()
 
 
 def generate_level(level):
+    global player
     tiles_group.empty()
     player_group.empty()
     enemy_group.empty()
     new_player, x, y = None, None, None
+    new_enemy, xE, yE = None, None, None
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == '.':
@@ -111,14 +115,16 @@ def generate_level(level):
             elif level[y][x] == '#':
                 Tile('wall', x, y)
             elif level[y][x] == 'E':
-                Tile('enemy', x, y)
+                Tile('empty', x, y)
+                xE, yE = x, y
+                new_enemy = Enemy(x, y)
             elif level[y][x] == 'p':
                 Tile('pobeda', x, y)
             elif level[y][x] == '@':
                 Tile('empty', x, y)
                 new_player = Player(x, y)
     # вернем игрока, а также размер поля в клетках
-    return new_player, x, y
+    return new_player, x, y, new_enemy, xE, yE
 
 
 class Tile(pygame.sprite.Sprite):
@@ -152,6 +158,21 @@ class Player(pygame.sprite.Sprite):
             print(self.health)
 
 
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(enemy_group, all_sprites)
+        self.image = enemy_image
+        self.tile_type = "enemy"
+        self.health = 1
+        self.health = 5
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x + 15, tile_height * pos_y + 5)
+        hit_list = pygame.sprite.spritecollide(self, enemy_group, False)
+        for enemy in hit_list:
+            self.health -= 1
+            print(self.health)
+
+
 def end_screen():
     outro_text = ["Ты победил!", ""
                                  "Поздравляю!", ""
@@ -169,6 +190,16 @@ def end_screen():
         intro_rect.x = 10
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                time.sleep(3)
+                terminate()
+        pygame.display.flip()
+        clock.tick(FPS)
 
 
 def loading_screen():
@@ -186,13 +217,13 @@ def loading_screen():
         intro_rect.x = 10
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
-
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
+                time.sleep(3)
                 second_level()
         pygame.display.flip()
         clock.tick(FPS)
@@ -254,7 +285,7 @@ def switch_level(scene):
 
 
 def first_level():
-    player, level_x, level_y = generate_level(load_level('map1.txt'))
+    player, level_x, level_y, enemy, xE, yE = generate_level(load_level('map1.txt'))
     running = True
     STEP = 10
     gameplay = True
@@ -263,8 +294,7 @@ def first_level():
         if gameplay:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
-                    switch_level(None)
+                    terminate()
                 elif player.rect.x >= width:
                     end_screen()
                 elif event.type == pygame.KEYDOWN:
@@ -315,26 +345,37 @@ def first_level():
 
 
 def second_level():
-    player, level_x, level_y = generate_level(load_level('map2.txt'))
+    global player
+    player, level_x, level_y, enemy, xE, yE = generate_level(load_level('map2.txt'))
     running = True
     STEP = 10
     camera = Camera()
     while running:
+        enemy_step = randint(0, 3)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-                switch_level(None)
-            elif player.rect.x >= width:
-                end_screen()
+                terminate()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT or event.key == ord('a'):
                     player.rect.x -= STEP
+
                 if event.key == pygame.K_RIGHT or event.key == ord('d'):
                     player.rect.x += STEP
+
                 if event.key == pygame.K_UP or event.key == ord('w'):
                     player.rect.y -= STEP
+
                 if event.key == pygame.K_DOWN or event.key == ord('s'):
                     player.rect.y += STEP
+
+                if enemy_step == 0:
+                    enemy.rect.x -= STEP
+                if enemy_step == 1:
+                    enemy.rect.x += STEP
+                if enemy_step == 2:
+                    enemy.rect.y -= STEP
+                if enemy_step == 3:
+                    enemy.rect.y += STEP
         screen.fill(pygame.Color(0, 0, 0))
         camera.update(player)
         for sprite in all_sprites:
@@ -348,7 +389,7 @@ def second_level():
 
 
 start_screen()
-switch_level(first_level())
+first_level()
 while currect_scene is not None:
     currect_scene()
 terminate()
