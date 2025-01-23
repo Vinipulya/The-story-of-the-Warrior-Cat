@@ -102,6 +102,7 @@ enemy_group = pygame.sprite.Group()
 
 
 def generate_level(level):
+    global player
     tiles_group.empty()
     player_group.empty()
     enemy_group.empty()
@@ -116,7 +117,7 @@ def generate_level(level):
             elif level[y][x] == 'E':
                 Tile('empty', x, y)
                 xE, yE = x, y
-                new_enemy = Enemy(x,y)
+                new_enemy = Enemy(x, y)
             elif level[y][x] == 'p':
                 Tile('pobeda', x, y)
             elif level[y][x] == '@':
@@ -155,6 +156,7 @@ class Player(pygame.sprite.Sprite):
         for enemy in hit_list:
             self.health -= 1
             print(self.health)
+
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
@@ -343,29 +345,36 @@ def first_level():
 
 
 def second_level():
+    global player
     player, level_x, level_y, enemy, xE, yE = generate_level(load_level('map2.txt'))
     running = True
     STEP = 10
     camera = Camera()
     while running:
-        enemy_step = randint(0,3)
+        enemy_step = randint(0, 3)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
-            elif player.rect.x >= width:
-                end_screen()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT or event.key == ord('a'):
                     player.rect.x -= STEP
-                    enemy.rect.x -= STEP
+
                 if event.key == pygame.K_RIGHT or event.key == ord('d'):
                     player.rect.x += STEP
-                    enemy.rect.x += STEP
+
                 if event.key == pygame.K_UP or event.key == ord('w'):
                     player.rect.y -= STEP
-                    enemy.rect.y -= STEP
+
                 if event.key == pygame.K_DOWN or event.key == ord('s'):
                     player.rect.y += STEP
+
+                if enemy_step == 0:
+                    enemy.rect.x -= STEP
+                if enemy_step == 1:
+                    enemy.rect.x += STEP
+                if enemy_step == 2:
+                    enemy.rect.y -= STEP
+                if enemy_step == 3:
                     enemy.rect.y += STEP
         screen.fill(pygame.Color(0, 0, 0))
         camera.update(player)
