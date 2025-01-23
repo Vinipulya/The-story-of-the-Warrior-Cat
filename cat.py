@@ -162,8 +162,13 @@ class Enemy(pygame.sprite.Sprite):
         self.image = enemy_image
         self.tile_type = "enemy"
         self.health = 1
+        self.health = 5
         self.rect = self.image.get_rect().move(
             tile_width * pos_x + 15, tile_height * pos_y + 5)
+        hit_list = pygame.sprite.spritecollide(self, enemy_group, False)
+        for enemy in hit_list:
+            self.health -= 1
+            print(self.health)
 
 
 def end_screen():
@@ -183,6 +188,16 @@ def end_screen():
         intro_rect.x = 10
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                time.sleep(3)
+                terminate()
+        pygame.display.flip()
+        clock.tick(FPS)
 
 
 def loading_screen():
