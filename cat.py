@@ -80,14 +80,16 @@ def load_level(filename):
 
 
 tile_images = {
-    'wall': pygame.transform.scale(load_image('Tentacle.png'), (70, 70)),
-    'empty': pygame.transform.scale(load_image('Tiles.png'), (70, 70)),
-    'pobeda': pygame.transform.scale(load_image("pobeda.jpg"), (70, 70)),
+    'wall_fr': pygame.transform.scale(load_image('Wall_front.png'), (100, 100)),
+    'wall_fr_1': pygame.transform.scale(load_image('Wall_front_1.png'), (100, 100)),
+    'tent': pygame.transform.scale(load_image('Tentacle.png'), (100, 100)),
+    'empty': pygame.transform.scale(load_image('Tiles.png'), (100, 100)),
+    'pobeda': pygame.transform.scale(load_image("pobeda.jpg"), (100, 100)),
 }
-player_image = load_image('Cat_Warrior.png')
-enemy_image = pygame.transform.scale(load_image("Ishak.png"), (70, 70))
+player_image = pygame.transform.scale(load_image('Cat_Warrior.png'), (90, 90))
+enemy_image = pygame.transform.scale(load_image("Ishak.png"), (100, 100))
 
-tile_width = tile_height = 70
+tile_width = tile_height = 100
 
 # основной персонаж
 player = None
@@ -95,7 +97,9 @@ player = None
 # группы спрайтов
 all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
-wall_group = pygame.sprite.Group()
+wall_fr_group = pygame.sprite.Group()
+wall_fr_1_group = pygame.sprite.Group()
+tent_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 pobeda_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
@@ -113,7 +117,11 @@ def generate_level(level):
             if level[y][x] == '.':
                 Tile('empty', x, y)
             elif level[y][x] == '#':
-                Tile('wall', x, y)
+                Tile('wall_fr', x, y)
+            elif level[y][x] == 'H':
+                Tile('wall_fr_1', x, y)
+            elif level[y][x] == 'F':
+                Tile('tent', x, y)
             elif level[y][x] == 'E':
                 Tile('empty', x, y)
                 xE, yE = x, y
@@ -129,8 +137,12 @@ def generate_level(level):
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y):
-        if tile_type == 'wall':
-            super().__init__(tiles_group, all_sprites, wall_group)
+        if tile_type == 'wall_fr':
+            super().__init__(tiles_group, all_sprites, wall_fr_group)
+        elif tile_type == 'wall_fr_1':
+            super().__init__(tiles_group, all_sprites, wall_fr_1_group)
+        elif tile_type == 'tent':
+            super().__init__(tiles_group, all_sprites, tent_group)
         elif tile_type == 'pobeda':
             super().__init__(tiles_group, all_sprites, pobeda_group)
         elif tile_type == 'enemy':
@@ -151,11 +163,7 @@ class Player(pygame.sprite.Sprite):
         self.tile_type = "player"
         self.health = 5
         self.rect = self.image.get_rect().move(
-            tile_width * pos_x + 15, tile_height * pos_y + 5)
-        hit_list = pygame.sprite.spritecollide(self, enemy_group, False)
-        for enemy in hit_list:
-            self.health -= 1
-            print(self.health)
+            tile_width * pos_x + 60, tile_height * pos_y + 15)
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -287,7 +295,8 @@ def switch_level(scene):
 def first_level():
     player, level_x, level_y, enemy, xE, yE = generate_level(load_level('map1.txt'))
     running = True
-    STEP = 10
+    STEP = 11
+    health = 5
     gameplay = True
     camera = Camera()
     while running:
@@ -300,37 +309,47 @@ def first_level():
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT or event.key == ord('a'):
                         player.rect.x -= STEP
-                        if pygame.sprite.groupcollide(player_group, wall_group, False, False):
-                            loose_screen()
+                    if pygame.sprite.groupcollide(player_group, tent_group, False, False):
+                        health -= 1
 
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
                             loading_screen()
                             switch_level(second_level())
                             gameplay = False
+
                     if event.key == pygame.K_RIGHT or event.key == ord('d'):
                         player.rect.x += STEP
-                        if pygame.sprite.groupcollide(player_group, wall_group, False, False):
-                            loose_screen()
+                        if pygame.sprite.groupcollide(player_group, tent_group, False, False):
+                            health -= 1
+
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
                             loading_screen()
                             switch_level(second_level())
                             gameplay = False
+
                     if event.key == pygame.K_UP or event.key == ord('w'):
                         player.rect.y -= STEP
-                        if pygame.sprite.groupcollide(player_group, wall_group, False, False):
-                            loose_screen()
+                        if pygame.sprite.groupcollide(player_group, tent_group, False, False):
+                            health -= 1
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
                             loading_screen()
                             switch_level(second_level())
                             gameplay = False
+
                     if event.key == pygame.K_DOWN or event.key == ord('s'):
                         player.rect.y += STEP
-                        if pygame.sprite.groupcollide(player_group, wall_group, False, False):
-                            loose_screen()
+
+
+
+                        if pygame.sprite.groupcollide(player_group, tent_group, False, False):
+                            health -= 1
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
                             loading_screen()
                             switch_level(second_level())
                             gameplay = False
+
+            if health == 0:
+                loose_screen()
 
             screen.fill(pygame.Color(0, 0, 0))
             camera.update(player)
