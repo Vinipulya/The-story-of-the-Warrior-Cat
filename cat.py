@@ -295,7 +295,7 @@ def switch_level(scene):
 def first_level():
     player, level_x, level_y, enemy, xE, yE = generate_level(load_level('map1.txt'))
     running = True
-    STEP = 11
+    STEP = 10
     health = 5
     gameplay = True
     camera = Camera()
@@ -307,18 +307,13 @@ def first_level():
                 elif player.rect.x >= width:
                     end_screen()
                 elif event.type == pygame.KEYDOWN:
+
                     if event.key == pygame.K_LEFT or event.key == ord('a'):
                         player.rect.x -= STEP
-                    if pygame.sprite.groupcollide(player_group, tent_group, False, False):
-                        health -= 1
+                        if pygame.sprite.groupcollide(player_group, wall_fr_1_group, False, False) or \
+                                pygame.sprite.groupcollide(player_group, wall_fr_group, False, False):
+                            player.rect.x += STEP
 
-                        if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
-                            loading_screen()
-                            switch_level(second_level())
-                            gameplay = False
-
-                    if event.key == pygame.K_RIGHT or event.key == ord('d'):
-                        player.rect.x += STEP
                         if pygame.sprite.groupcollide(player_group, tent_group, False, False):
                             health -= 1
 
@@ -327,8 +322,27 @@ def first_level():
                             switch_level(second_level())
                             gameplay = False
 
+                    if event.key == pygame.K_RIGHT or event.key == ord('d'):
+                        player.rect.x += STEP
+                        if pygame.sprite.groupcollide(player_group, wall_fr_1_group, False, False) or \
+                                pygame.sprite.groupcollide(player_group, wall_fr_group, False, False):
+                            player.rect.x -= STEP
+
+                        if pygame.sprite.groupcollide(player_group, tent_group, False, False):
+                            health -= 1
+                            player.rect.x -= 3 * STEP
+
+                        if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
+                            loading_screen()
+                            switch_level(second_level())
+                            gameplay = False
+
                     if event.key == pygame.K_UP or event.key == ord('w'):
                         player.rect.y -= STEP
+                        if pygame.sprite.groupcollide(player_group, wall_fr_1_group, False, False) or \
+                                pygame.sprite.groupcollide(player_group, wall_fr_group, False, False):
+                            player.rect.y += STEP
+
                         if pygame.sprite.groupcollide(player_group, tent_group, False, False):
                             health -= 1
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
@@ -338,8 +352,9 @@ def first_level():
 
                     if event.key == pygame.K_DOWN or event.key == ord('s'):
                         player.rect.y += STEP
-
-
+                        if pygame.sprite.groupcollide(player_group, wall_fr_1_group, False, False) or \
+                                pygame.sprite.groupcollide(player_group, wall_fr_group, False, False):
+                            player.rect.y -= STEP
 
                         if pygame.sprite.groupcollide(player_group, tent_group, False, False):
                             health -= 1
