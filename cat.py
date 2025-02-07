@@ -37,7 +37,6 @@ def load_image(name, colorkey=None):
 
 
 def start_screen():
-
     fon = pygame.transform.scale(load_image('fon.png'), (width, height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
@@ -73,6 +72,7 @@ tile_images = {
     'tent': pygame.transform.scale(load_image('Tentacle.png'), (100, 100)),
     'empty': pygame.transform.scale(load_image('Tiles.png'), (100, 100)),
     'pobeda': pygame.transform.scale(load_image("pobeda.jpg"), (100, 100)),
+    'listok': pygame.transform.scale(load_image("listok.png"), (100, 100))
 }
 player_image = pygame.transform.scale(load_image('Cat_Warrior.png'), (90, 90))
 enemy_image = pygame.transform.scale(load_image("Ishak.png"), (100, 100))
@@ -91,6 +91,7 @@ tent_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 pobeda_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
+listok_group = pygame.sprite.Group()
 
 
 def generate_level(level):
@@ -119,6 +120,9 @@ def generate_level(level):
             elif level[y][x] == '@':
                 Tile('empty', x, y)
                 new_player = Player(x, y)
+            elif level[y][x] == 'l':
+                Tile('empty', x, y)
+                Tile('listok', x, y)
     # вернем игрока, а также размер поля в клетках
     return new_player, x, y, new_enemy, xE, yE
 
@@ -131,6 +135,8 @@ class Tile(pygame.sprite.Sprite):
             super().__init__(tiles_group, all_sprites, wall_fr_1_group)
         elif tile_type == 'tent':
             super().__init__(tiles_group, all_sprites, tent_group)
+        elif tile_type == 'listok':
+            super().__init__(tiles_group, all_sprites, listok_group)
         elif tile_type == 'pobeda':
             super().__init__(tiles_group, all_sprites, pobeda_group)
         elif tile_type == 'enemy':
@@ -303,7 +309,8 @@ def first_level():
                     if event.key == pygame.K_LEFT or event.key == ord('a'):
                         player.rect.x -= STEP
                         if pygame.sprite.groupcollide(player_group, wall_fr_1_group, False, False) or \
-                                pygame.sprite.groupcollide(player_group, wall_fr_group, False, False):
+                                pygame.sprite.groupcollide(player_group, wall_fr_group, False,
+                                                           False):
                             player.rect.x += STEP
 
                         if pygame.sprite.groupcollide(player_group, tent_group, False, False):
@@ -318,7 +325,8 @@ def first_level():
                     if event.key == pygame.K_RIGHT or event.key == ord('d'):
                         player.rect.x += STEP
                         if pygame.sprite.groupcollide(player_group, wall_fr_1_group, False, False) or \
-                                pygame.sprite.groupcollide(player_group, wall_fr_group, False, False):
+                                pygame.sprite.groupcollide(player_group, wall_fr_group, False,
+                                                           False):
                             player.rect.x -= STEP
 
                         if pygame.sprite.groupcollide(player_group, tent_group, False, False):
@@ -333,7 +341,8 @@ def first_level():
                     if event.key == pygame.K_UP or event.key == ord('w'):
                         player.rect.y -= STEP
                         if pygame.sprite.groupcollide(player_group, wall_fr_1_group, False, False) or \
-                                pygame.sprite.groupcollide(player_group, wall_fr_group, False, False):
+                                pygame.sprite.groupcollide(player_group, wall_fr_group, False,
+                                                           False):
                             player.rect.y += STEP
 
                         if pygame.sprite.groupcollide(player_group, tent_group, False, False):
@@ -348,7 +357,8 @@ def first_level():
                     if event.key == pygame.K_DOWN or event.key == ord('s'):
                         player.rect.y += STEP
                         if pygame.sprite.groupcollide(player_group, wall_fr_1_group, False, False) or \
-                                pygame.sprite.groupcollide(player_group, wall_fr_group, False, False):
+                                pygame.sprite.groupcollide(player_group, wall_fr_group, False,
+                                                           False):
                             player.rect.y -= STEP
 
                         if pygame.sprite.groupcollide(player_group, tent_group, False, False):
@@ -381,12 +391,15 @@ def second_level():
     running = True
     STEP = 10
     camera = Camera()
+    count = 0
     while running:
-        print(player.pos_x, player.pos_y)
+        print(player.pos_x, player.pos_y, enemy.pos_x, enemy.pos_y)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.KEYDOWN:
+                if pygame.sprite.groupcollide(player_group, listok_group, False, True):
+                    count += 1
                 if event.key == pygame.K_LEFT or event.key == ord('a'):
                     player.rect.x -= STEP
                     player.pos_x -= STEP
@@ -416,6 +429,9 @@ def second_level():
                     enemy.rect.y -= STEP
                     enemy.pos_y -= STEP
 
+                if count == 6:
+                    end_screen()
+
         screen.fill(pygame.Color(0, 0, 0))
         camera.update(player)
         for sprite in all_sprites:
@@ -429,7 +445,7 @@ def second_level():
 
 
 start_screen()
-first_level()
+second_level()
 while currect_scene is not None:
     currect_scene()
 terminate()
