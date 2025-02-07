@@ -75,7 +75,10 @@ tile_images = {
     'pobeda': pygame.transform.scale(load_image("pobeda.jpg"), (100, 100)),
 }
 player_image = pygame.transform.scale(load_image('Cat_Warrior.png'), (90, 90))
+
 enemy_image = pygame.transform.scale(load_image("Ishak.png"), (100, 100))
+
+health_image = pygame.transform.scale(load_image('heart.png'), (120, 120))
 
 tile_width = tile_height = 100
 
@@ -91,6 +94,7 @@ tent_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 pobeda_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
+health_group = pygame.sprite.Group()
 
 
 def generate_level(level):
@@ -148,10 +152,13 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(player_group, all_sprites)
         self.image = player_image
+        self.health = health_image
         self.tile_type = "player"
-        self.health = 5
         self.rect = self.image.get_rect().move(
             tile_width * pos_x + 60, tile_height * pos_y + 15)
+        self.health_rect = self.health.get_rect().move(
+            tile_width * pos_x + 60, tile_height * pos_y + 15)
+
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -163,10 +170,7 @@ class Enemy(pygame.sprite.Sprite):
         self.health = 5
         self.rect = self.image.get_rect().move(
             tile_width * pos_x + 15, tile_height * pos_y + 5)
-        hit_list = pygame.sprite.spritecollide(self, enemy_group, False)
-        for enemy in hit_list:
-            self.health -= 1
-            print(self.health)
+
 
 
 def end_screen():
