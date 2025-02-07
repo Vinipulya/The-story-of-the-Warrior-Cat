@@ -8,7 +8,7 @@ import pygame
 
 pygame.init()
 pygame.key.set_repeat(200, 70)
-size = width, height = 900, 900
+size = width, height = 1200, 800
 screen = pygame.display.set_mode(size)
 FPS = 50
 clock = pygame.time.Clock()
@@ -37,23 +37,11 @@ def load_image(name, colorkey=None):
 
 
 def start_screen():
-    intro_text = ["ЗАСТАВКА", "",
-                  "Правила игры",
-                  "Если в правилах несколько строк,",
-                  "приходится выводить их построчно"]
 
-    fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
+    fon = pygame.transform.scale(load_image('fon.png'), (width, height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
     text_coord = 70
-    for line in intro_text:
-        string_rendered = font.render(line, 1, pygame.Color('white'))
-        intro_rect = string_rendered.get_rect()
-        text_coord += 10
-        intro_rect.top = text_coord
-        intro_rect.x = 10
-        text_coord += intro_rect.height
-        screen.blit(string_rendered, intro_rect)
 
     while True:
         for event in pygame.event.get():
@@ -316,6 +304,7 @@ def first_level():
 
                         if pygame.sprite.groupcollide(player_group, tent_group, False, False):
                             health -= 1
+                            player.rect.x += 2 * STEP
 
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
                             loading_screen()
@@ -330,7 +319,7 @@ def first_level():
 
                         if pygame.sprite.groupcollide(player_group, tent_group, False, False):
                             health -= 1
-                            player.rect.x -= 3 * STEP
+                            player.rect.x -= 2 * STEP
 
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
                             loading_screen()
@@ -345,6 +334,8 @@ def first_level():
 
                         if pygame.sprite.groupcollide(player_group, tent_group, False, False):
                             health -= 1
+                            player.rect.y += 2 * STEP
+
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
                             loading_screen()
                             switch_level(second_level())
@@ -358,6 +349,8 @@ def first_level():
 
                         if pygame.sprite.groupcollide(player_group, tent_group, False, False):
                             health -= 1
+                            player.rect.y -= 2 * STEP
+
                         if pygame.sprite.groupcollide(player_group, pobeda_group, False, False):
                             loading_screen()
                             switch_level(second_level())
