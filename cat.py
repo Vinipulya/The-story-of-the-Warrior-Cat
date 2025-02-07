@@ -73,12 +73,14 @@ tile_images = {
     'tent': pygame.transform.scale(load_image('Tentacle.png'), (100, 100)),
     'empty': pygame.transform.scale(load_image('Tiles.png'), (100, 100)),
     'pobeda': pygame.transform.scale(load_image("pobeda.jpg"), (100, 100)),
+    #'heart': pygame.transform.scale(load_image("heart.png"), (100, 100))
 }
 player_image = pygame.transform.scale(load_image('Cat_Warrior.png'), (90, 90))
 
 enemy_image = pygame.transform.scale(load_image("Ishak.png"), (100, 100))
 
-health_image = pygame.transform.scale(load_image('heart.png'), (120, 120))
+heart_image = pygame.transform.scale(load_image("heart.png"), (100, 100))
+
 
 tile_width = tile_height = 100
 
@@ -102,8 +104,10 @@ def generate_level(level):
     tiles_group.empty()
     player_group.empty()
     enemy_group.empty()
+    health_group.empty()
     new_player, x, y = None, None, None
     new_enemy, xE, yE = None, None, None
+    new_heart, xY, yY = None, None, None
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == '.':
@@ -120,11 +124,15 @@ def generate_level(level):
                 new_enemy = Enemy(x, y)
             elif level[y][x] == 'p':
                 Tile('pobeda', x, y)
+            elif level[y][x] == 'Y':
+                Tile('empty', x, y)
+                #Tile('empty', x, y)
+                xY, yY = x, y
+                new_heart = Heart(x, y)
             elif level[y][x] == '@':
                 Tile('empty', x, y)
                 new_player = Player(x, y)
-    # вернем игрока, а также размер поля в клетках
-    return new_player, x, y, new_enemy, xE, yE
+    return new_player, x, y, new_enemy, xE, yE, new_heart, xY, yY
 
 
 class Tile(pygame.sprite.Sprite):
@@ -139,6 +147,8 @@ class Tile(pygame.sprite.Sprite):
             super().__init__(tiles_group, all_sprites, pobeda_group)
         elif tile_type == 'enemy':
             super().__init__(tiles_group, all_sprites, enemy_group)
+        elif tile_type == 'heart':
+            super().__init__(tiles_group, all_sprites, health_group)
 
         else:
             super().__init__(tiles_group, all_sprites)
@@ -152,11 +162,8 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(player_group, all_sprites)
         self.image = player_image
-        self.health = health_image
         self.tile_type = "player"
         self.rect = self.image.get_rect().move(
-            tile_width * pos_x + 60, tile_height * pos_y + 15)
-        self.health_rect = self.health.get_rect().move(
             tile_width * pos_x + 60, tile_height * pos_y + 15)
 
 
@@ -166,10 +173,18 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__(enemy_group, all_sprites)
         self.image = enemy_image
         self.tile_type = "enemy"
-        self.health = 1
-        self.health = 5
         self.rect = self.image.get_rect().move(
             tile_width * pos_x + 15, tile_height * pos_y + 5)
+
+
+class Heart(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(health_group, all_sprites)
+        self.image = heart_image
+        self.tile_type = "heart"
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x + 60, tile_height * pos_y + 15)
+
 
 
 
@@ -285,7 +300,7 @@ def switch_level(scene):
 
 
 def first_level():
-    player, level_x, level_y, enemy, xE, yE = generate_level(load_level('map1.txt'))
+    player, level_x, level_y, enemy, xE, yE, heart, xY, yY = generate_level(load_level('map1.txt'))
     running = True
     STEP = 10
     health = 5
@@ -293,6 +308,7 @@ def first_level():
     camera = Camera()
     while running:
         if gameplay:
+            heart_step = randint(0, 3)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     terminate()
@@ -302,6 +318,7 @@ def first_level():
 
                     if event.key == pygame.K_LEFT or event.key == ord('a'):
                         player.rect.x -= STEP
+                        #heart.rect.x -= STEP
                         if pygame.sprite.groupcollide(player_group, wall_fr_1_group, False, False) or \
                                 pygame.sprite.groupcollide(player_group, wall_fr_group, False, False):
                             player.rect.x += STEP
@@ -317,6 +334,7 @@ def first_level():
 
                     if event.key == pygame.K_RIGHT or event.key == ord('d'):
                         player.rect.x += STEP
+                        #heart.rect.x += STEP
                         if pygame.sprite.groupcollide(player_group, wall_fr_1_group, False, False) or \
                                 pygame.sprite.groupcollide(player_group, wall_fr_group, False, False):
                             player.rect.x -= STEP
@@ -332,6 +350,7 @@ def first_level():
 
                     if event.key == pygame.K_UP or event.key == ord('w'):
                         player.rect.y -= STEP
+                        heart.rect.y -= STEP
                         if pygame.sprite.groupcollide(player_group, wall_fr_1_group, False, False) or \
                                 pygame.sprite.groupcollide(player_group, wall_fr_group, False, False):
                             player.rect.y += STEP
@@ -347,6 +366,7 @@ def first_level():
 
                     if event.key == pygame.K_DOWN or event.key == ord('s'):
                         player.rect.y += STEP
+                        heart.rect.y += STEP
                         if pygame.sprite.groupcollide(player_group, wall_fr_1_group, False, False) or \
                                 pygame.sprite.groupcollide(player_group, wall_fr_group, False, False):
                             player.rect.y -= STEP
@@ -359,6 +379,15 @@ def first_level():
                             loading_screen()
                             switch_level(second_level())
                             gameplay = False
+
+                    if heart_step == 0:
+                        heart.rect.x -= STEP
+                    if heart_step == 1:
+                        heart.rect.x += STEP
+                    if heart_step == 2:
+                        heart.rect.y -= STEP
+                    if heart_step == 3:
+                        heart.rect.y += STEP
 
             if health == 0:
                 loose_screen()
@@ -377,7 +406,7 @@ def first_level():
 
 def second_level():
     global player
-    player, level_x, level_y, enemy, xE, yE = generate_level(load_level('map2.txt'))
+    player, level_x, level_y, enemy, xE, yE, heart, xY, yY = generate_level(load_level('map2.txt'))
     running = True
     STEP = 10
     camera = Camera()
