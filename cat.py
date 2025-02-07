@@ -178,12 +178,12 @@ def end_screen():
                                  "Поздравляю!", ""
                                                 "Нажми любую кнопку, чтобы выйти."]
 
-    fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
+    fon = pygame.transform.scale(load_image('fon.png'), (width, height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
     text_coord = 70
     for line in outro_text:
-        string_rendered = font.render(line, 1, pygame.Color('white'))
+        string_rendered = font.render(line, 1, pygame.Color('yellow'))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
@@ -232,14 +232,14 @@ def loading_screen():
 def loose_screen():
     outro_text = ["Ты проиграл.", ""
                                   "", ""
-                                      "Нажми любую кнопку, чтобы выйти."]
+                                      "Нажми любую кнопку, чтобы возродиться."]
 
-    fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
+    fon = pygame.transform.scale(load_image('fon.png'), (width, height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
     text_coord = 70
     for line in outro_text:
-        string_rendered = font.render(line, 1, pygame.Color('white'))
+        string_rendered = font.render(line, 1, pygame.Color('yellow'))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
@@ -429,7 +429,7 @@ def second_level():
 
 
 start_screen()
-second_level()
+first_level()
 while currect_scene is not None:
     currect_scene()
 terminate()
