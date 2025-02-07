@@ -156,8 +156,8 @@ class Player(pygame.sprite.Sprite):
         self.image = player_image
         self.tile_type = "player"
         self.health = 5
-        self.pos_x = pos_x
-        self.pos_y = pos_y
+        self.pos_x = pos_x * 100 + 50
+        self.pos_y = pos_y * 100 + 50
         self.rect = self.image.get_rect().move(
             tile_width * pos_x + 60, tile_height * pos_y + 15)
 
@@ -169,8 +169,8 @@ class Enemy(pygame.sprite.Sprite):
         self.tile_type = "enemy"
         self.health = 1
         self.health = 5
-        self.pos_x = pos_x
-        self.pos_y = pos_y
+        self.pos_x = pos_x * 100 + 50
+        self.pos_y = pos_y * 100 + 50
         self.rect = self.image.get_rect().move(
             tile_width * pos_x + 15, tile_height * pos_y + 5)
         hit_list = pygame.sprite.spritecollide(self, enemy_group, False)
@@ -235,7 +235,7 @@ def loading_screen():
         clock.tick(FPS)
 
 
-def loose_screen():
+def loose_screen(level):
     outro_text = ["Ты проиграл.", ""
                                   "", ""
                                       "Нажми любую кнопку, чтобы возродиться."]
@@ -259,7 +259,10 @@ def loose_screen():
                 terminate()
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
-                return first_level()
+                if level == 1:
+                    return first_level()
+                elif level == 2:
+                    return second_level()
 
         pygame.display.flip()
         clock.tick(FPS)
@@ -291,6 +294,7 @@ def switch_level(scene):
 
 
 def first_level():
+    level = 1
     player, level_x, level_y, enemy, xE, yE = generate_level(load_level('map1.txt'))
     running = True
     STEP = 10
@@ -371,7 +375,7 @@ def first_level():
                             gameplay = False
 
             if health == 0:
-                loose_screen()
+                loose_screen(level)
 
             screen.fill(pygame.Color(0, 0, 0))
             camera.update(player)
@@ -392,6 +396,8 @@ def second_level():
     STEP = 10
     camera = Camera()
     count = 0
+    health = 5
+    level = 2
     while running:
         print(player.pos_x, player.pos_y, enemy.pos_x, enemy.pos_y)
         for event in pygame.event.get():
@@ -400,6 +406,10 @@ def second_level():
             elif event.type == pygame.KEYDOWN:
                 if pygame.sprite.groupcollide(player_group, listok_group, False, True):
                     count += 1
+                if pygame.sprite.groupcollide(player_group, enemy_group, False, False):
+                    health -= 1
+                if health == 0:
+                    loose_screen(level)
                 if event.key == pygame.K_LEFT or event.key == ord('a'):
                     player.rect.x -= STEP
                     player.pos_x -= STEP
@@ -417,17 +427,17 @@ def second_level():
                     player.pos_y += STEP
 
                 if enemy.pos_x > player.pos_x:
-                    enemy.rect.x -= STEP
-                    enemy.pos_x -= STEP
+                    enemy.rect.x -= STEP // 2
+                    enemy.pos_x -= STEP // 2
                 elif enemy.pos_x < player.pos_x:
-                    enemy.rect.x += STEP
-                    enemy.pos_x += STEP
+                    enemy.rect.x += STEP // 2
+                    enemy.pos_x += STEP // 2
                 if enemy.pos_y < player.pos_y:
-                    enemy.rect.y += STEP
-                    enemy.pos_y += STEP
+                    enemy.rect.y += STEP // 2
+                    enemy.pos_y += STEP // 2
                 elif enemy.pos_y > player.pos_y:
-                    enemy.rect.y -= STEP
-                    enemy.pos_y -= STEP
+                    enemy.rect.y -= STEP // 2
+                    enemy.pos_y -= STEP // 2
 
                 if count == 6:
                     end_screen()
