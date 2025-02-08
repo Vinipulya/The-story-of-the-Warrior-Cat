@@ -204,22 +204,8 @@ class Enemy(pygame.sprite.Sprite):
 
 
 def end_screen():
-    outro_text = ["Ты победил!", ""
-                                 "Поздравляю!", ""
-                                                "Нажми любую кнопку, чтобы выйти."]
-
-    fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
+    fon = pygame.transform.scale(load_image('end.webp'), (width, height))
     screen.blit(fon, (0, 0))
-    font = pygame.font.Font(None, 30)
-    text_coord = 70
-    for line in outro_text:
-        string_rendered = font.render(line, 1, pygame.Color('white'))
-        intro_rect = string_rendered.get_rect()
-        text_coord += 10
-        intro_rect.top = text_coord
-        intro_rect.x = 10
-        text_coord += intro_rect.height
-        screen.blit(string_rendered, intro_rect)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -233,20 +219,9 @@ def end_screen():
 
 
 def loading_screen():
-    outro_text = ["Загрузка уровня..."]
-
-    fon = pygame.transform.scale(load_image('loading_level.jpg'), (width, height))
+    fon = pygame.transform.scale(load_image('loading.webp'), (width, height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
-    text_coord = 70
-    for line in outro_text:
-        string_rendered = font.render(line, 1, pygame.Color('white'))
-        intro_rect = string_rendered.get_rect()
-        text_coord += 10
-        intro_rect.top = text_coord
-        intro_rect.x = 10
-        text_coord += intro_rect.height
-        screen.blit(string_rendered, intro_rect)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -260,22 +235,9 @@ def loading_screen():
 
 
 def loose_screen():
-    outro_text = ["Ты проиграл.", ""
-                                  "", ""
-                                      "Нажми любую кнопку, чтобы выйти."]
-
-    fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
+    fon = pygame.transform.scale(load_image('lose.png'), (width, height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
-    text_coord = 70
-    for line in outro_text:
-        string_rendered = font.render(line, 1, pygame.Color('white'))
-        intro_rect = string_rendered.get_rect()
-        text_coord += 10
-        intro_rect.top = text_coord
-        intro_rect.x = 10
-        text_coord += intro_rect.height
-        screen.blit(string_rendered, intro_rect)
 
     while True:
         for event in pygame.event.get():
@@ -468,7 +430,7 @@ def second_level():
 
 
 start_screen()
-second_level()
+first_level()
 while currect_scene is not None:
     currect_scene()
 terminate()
