@@ -37,6 +37,7 @@ def load_image(name, colorkey=None):
 
 
 def start_screen():
+
     fon = pygame.transform.scale(load_image('fon.png'), (width, height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
@@ -69,13 +70,20 @@ def load_level(filename):
 tile_images = {
     'wall_fr': pygame.transform.scale(load_image('Wall_front.png'), (100, 100)),
     'wall_fr_1': pygame.transform.scale(load_image('Wall_front_1.png'), (100, 100)),
+    'tavern_l': pygame.transform.scale(load_image('tavern_left.png'), (100, 100)),
+    'tavern_fr': pygame.transform.scale(load_image('tavern_front.png'), (100, 100)),
+    'tavern_r': pygame.transform.scale(load_image('tavern_right.png'), (100, 100)),
+    'river': pygame.transform.scale(load_image('river.png'), (100, 100)),
+    'most': pygame.transform.scale(load_image('most.png'), (100, 100)),
     'tent': pygame.transform.scale(load_image('Tentacle.png'), (100, 100)),
     'empty': pygame.transform.scale(load_image('Tiles.png'), (100, 100)),
     'pobeda': pygame.transform.scale(load_image("pobeda.jpg"), (100, 100)),
     'listok': pygame.transform.scale(load_image("listok.png"), (100, 100))
 }
 player_image = pygame.transform.scale(load_image('Cat_Warrior.png'), (90, 90))
+
 enemy_image = pygame.transform.scale(load_image("Ishak.png"), (100, 100))
+
 
 tile_width = tile_height = 100
 
@@ -87,11 +95,20 @@ all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 wall_fr_group = pygame.sprite.Group()
 wall_fr_1_group = pygame.sprite.Group()
+
+tavern_l_group = pygame.sprite.Group()
+tavern_fr_group = pygame.sprite.Group()
+tavern_r_group = pygame.sprite.Group()
+
+river_group = pygame.sprite.Group()
+most_group = pygame.sprite.Group()
+
 tent_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 pobeda_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 listok_group = pygame.sprite.Group()
+
 
 
 def generate_level(level):
@@ -117,6 +134,16 @@ def generate_level(level):
                 new_enemy = Enemy(x, y)
             elif level[y][x] == 'p':
                 Tile('pobeda', x, y)
+            elif level[y][x] == 'r':
+                Tile('river', x, y)
+            elif level[y][x] == 'm':
+                Tile('most', x, y)
+            elif level[y][x] == 'j':
+                Tile('tavern_l', x, y)
+            elif level[y][x] == 'T':
+                Tile('tavern_fr', x, y)
+            elif level[y][x] == 'k':
+                Tile('tavern_r', x, y)
             elif level[y][x] == '@':
                 Tile('empty', x, y)
                 new_player = Player(x, y)
@@ -133,6 +160,17 @@ class Tile(pygame.sprite.Sprite):
             super().__init__(tiles_group, all_sprites, wall_fr_group)
         elif tile_type == 'wall_fr_1':
             super().__init__(tiles_group, all_sprites, wall_fr_1_group)
+        elif tile_type == 'tavern_l':
+            super().__init__(tiles_group, all_sprites, tavern_l_group)
+        elif tile_type == 'tavern_fr':
+            super().__init__(tiles_group, all_sprites, tavern_fr_group)
+        elif tile_type == 'tavern_r':
+            super().__init__(tiles_group, all_sprites, tavern_r_group)
+
+        elif tile_type == 'river':
+            super().__init__(tiles_group, all_sprites, river_group)
+        elif tile_type == 'most':
+            super().__init__(tiles_group, all_sprites, most_group)
         elif tile_type == 'tent':
             super().__init__(tiles_group, all_sprites, tent_group)
         elif tile_type == 'listok':
@@ -162,6 +200,7 @@ class Player(pygame.sprite.Sprite):
             tile_width * pos_x + 60, tile_height * pos_y + 15)
 
 
+
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(enemy_group, all_sprites)
@@ -173,29 +212,11 @@ class Enemy(pygame.sprite.Sprite):
         self.pos_y = pos_y * 100 + 50
         self.rect = self.image.get_rect().move(
             tile_width * pos_x + 15, tile_height * pos_y + 5)
-        hit_list = pygame.sprite.spritecollide(self, enemy_group, False)
-        for enemy in hit_list:
-            self.health -= 1
-            print(self.health)
 
 
 def end_screen():
-    outro_text = ["Ты победил!", ""
-                                 "Поздравляю!", ""
-                                                "Нажми любую кнопку, чтобы выйти."]
-
-    fon = pygame.transform.scale(load_image('fon.png'), (width, height))
+    fon = pygame.transform.scale(load_image('end.webp'), (width, height))
     screen.blit(fon, (0, 0))
-    font = pygame.font.Font(None, 30)
-    text_coord = 70
-    for line in outro_text:
-        string_rendered = font.render(line, 1, pygame.Color('yellow'))
-        intro_rect = string_rendered.get_rect()
-        text_coord += 10
-        intro_rect.top = text_coord
-        intro_rect.x = 10
-        text_coord += intro_rect.height
-        screen.blit(string_rendered, intro_rect)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -209,20 +230,9 @@ def end_screen():
 
 
 def loading_screen():
-    outro_text = ["Загрузка уровня..."]
-
-    fon = pygame.transform.scale(load_image('loading_level.jpg'), (width, height))
+    fon = pygame.transform.scale(load_image('loading.webp'), (width, height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
-    text_coord = 70
-    for line in outro_text:
-        string_rendered = font.render(line, 1, pygame.Color('white'))
-        intro_rect = string_rendered.get_rect()
-        text_coord += 10
-        intro_rect.top = text_coord
-        intro_rect.x = 10
-        text_coord += intro_rect.height
-        screen.blit(string_rendered, intro_rect)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -236,22 +246,9 @@ def loading_screen():
 
 
 def loose_screen(level):
-    outro_text = ["Ты проиграл.", ""
-                                  "", ""
-                                      "Нажми любую кнопку, чтобы возродиться."]
-
-    fon = pygame.transform.scale(load_image('fon.png'), (width, height))
+    fon = pygame.transform.scale(load_image('lose.png'), (width, height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
-    text_coord = 70
-    for line in outro_text:
-        string_rendered = font.render(line, 1, pygame.Color('yellow'))
-        intro_rect = string_rendered.get_rect()
-        text_coord += 10
-        intro_rect.top = text_coord
-        intro_rect.x = 10
-        text_coord += intro_rect.height
-        screen.blit(string_rendered, intro_rect)
 
     while True:
         for event in pygame.event.get():
@@ -312,7 +309,8 @@ def first_level():
 
                     if event.key == pygame.K_LEFT or event.key == ord('a'):
                         player.rect.x -= STEP
-                        if pygame.sprite.groupcollide(player_group, wall_fr_1_group, False, False) or \
+                        if pygame.sprite.groupcollide(
+                                player_group, wall_fr_1_group, False, False) or \
                                 pygame.sprite.groupcollide(player_group, wall_fr_group, False,
                                                            False):
                             player.rect.x += STEP
@@ -328,7 +326,8 @@ def first_level():
 
                     if event.key == pygame.K_RIGHT or event.key == ord('d'):
                         player.rect.x += STEP
-                        if pygame.sprite.groupcollide(player_group, wall_fr_1_group, False, False) or \
+                        if pygame.sprite.groupcollide(
+                                player_group, wall_fr_1_group, False, False) or \
                                 pygame.sprite.groupcollide(player_group, wall_fr_group, False,
                                                            False):
                             player.rect.x -= STEP
@@ -344,7 +343,8 @@ def first_level():
 
                     if event.key == pygame.K_UP or event.key == ord('w'):
                         player.rect.y -= STEP
-                        if pygame.sprite.groupcollide(player_group, wall_fr_1_group, False, False) or \
+                        if pygame.sprite.groupcollide(
+                                player_group, wall_fr_1_group, False, False) or \
                                 pygame.sprite.groupcollide(player_group, wall_fr_group, False,
                                                            False):
                             player.rect.y += STEP
@@ -360,7 +360,8 @@ def first_level():
 
                     if event.key == pygame.K_DOWN or event.key == ord('s'):
                         player.rect.y += STEP
-                        if pygame.sprite.groupcollide(player_group, wall_fr_1_group, False, False) or \
+                        if pygame.sprite.groupcollide(
+                                player_group, wall_fr_1_group, False, False) or \
                                 pygame.sprite.groupcollide(player_group, wall_fr_group, False,
                                                            False):
                             player.rect.y -= STEP
@@ -399,7 +400,6 @@ def second_level():
     health = 5
     level = 2
     while running:
-        print(player.pos_x, player.pos_y, enemy.pos_x, enemy.pos_y)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
@@ -455,7 +455,7 @@ def second_level():
 
 
 start_screen()
-second_level()
+first_level()
 while currect_scene is not None:
     currect_scene()
 terminate()
